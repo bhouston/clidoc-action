@@ -102,5 +102,5 @@ trusted clidoc commits. File contents are parsed as data, never imported as code
 Inputs are passed through environment variables and separate process arguments.
 Network access is used for installation; document validation itself is offline.
 
-[Official documentation](https://clidoc.ben3d.ca/docs/guides/github-action) ·
+[Official documentation](https://clidoc-l5su5qyryq-uc.a.run.app/docs/guides/github-action/) ·
 [Contributing and releases](CONTRIBUTING.md) · [MIT license](LICENSE)
