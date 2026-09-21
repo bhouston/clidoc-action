@@ -1,0 +1,8 @@
+{
+  "name": "clidoc-action",
+  "private": true,
+  "type": "module",
+  "scripts": { "test": "node --test --experimental-test-coverage test/*.test.mjs" },
+  "engines": { "node": ">=26.1.0" },
+  "packageManager": "pnpm@11.1.3"
+}
