@@ -1,0 +1,54 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '26.1.0'
+      - run: npm test
+      - name: Validate both dialects and encodings
+        id: valid
+        uses: ./
+        with:
+          files: |
+            fixtures/bcdxn.json
+            fixtures/opencli-dev.yaml
+      - name: Check outputs
+        shell: bash
+        env:
+          COUNT: ${{ steps.valid.outputs.validated-count }}
+          VALIDATOR: ${{ steps.valid.outputs.validator }}
+        run: |
+          test "$COUNT" = 2
+          test "$VALIDATOR" = git:04bde9553899737ac46e363da889f2fa729a4445
+      - name: Test real validator failure cases and explicit formats
+        shell: bash
+        run: node test/integration.mjs
+      - name: Invalid documents must fail the action
+        id: invalid
+        continue-on-error: true
+        uses: ./
+        with:
+          files: fixtures/invalid.json
+      - name: Check failure propagation
+        if: always()
+        shell: bash
+        env:
+          OUTCOME: ${{ steps.invalid.outcome }}
+        run: test "$OUTCOME" = failure

@@ -1,0 +1,56 @@
+name: Validate OpenCLI with clidoc
+description: Validate OpenCLI JSON/YAML documents with a pinned clidoc validator.
+author: Ben Houston
+branding:
+  icon: check-circle
+  color: blue
+inputs:
+  files:
+    description: Newline-separated document paths relative to working-directory; no glob expansion.
+    required: true
+  specification:
+    description: Expected specification dialect (auto, bcdxn, opencli-dev).
+    default: auto
+  format:
+    description: Input serialization (auto, json, yaml).
+    default: auto
+  validator-version:
+    description: Exact published @clidoc/core npm version. When set, overrides validator-ref.
+    default: ''
+  validator-ref:
+    description: Full clidoc Git commit SHA used when validator-version is empty.
+    default: 04bde9553899737ac46e363da889f2fa729a4445
+  working-directory:
+    description: Directory containing documents, relative to the checked-out workspace.
+    default: .
+outputs:
+  validated-count:
+    description: Number of successfully validated documents (set only on success).
+    value: ${{ steps.validate.outputs.validated-count }}
+  validator:
+    description: Exact npm version or source revision used.
+    value: ${{ steps.validate.outputs.validator }}
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+      with:
+        node-version: '26.1.0'
+    - if: inputs.validator-version == ''
+      uses: pnpm/action-setup@a8198c4bff370c8506180b035930dea56dbd5288 # v5
+      with:
+        version: '11.1.3'
+        run_install: false
+        package_json_file: ${{ github.action_path }}/package.json
+    - name: Validate specifications
+      id: validate
+      shell: bash
+      env:
+        CLIDOC_ACTION_PATH: ${{ github.action_path }}
+        INPUT_FILES: ${{ inputs.files }}
+        INPUT_SPECIFICATION: ${{ inputs.specification }}
+        INPUT_FORMAT: ${{ inputs.format }}
+        INPUT_VALIDATOR_VERSION: ${{ inputs.validator-version }}
+        INPUT_VALIDATOR_REF: ${{ inputs.validator-ref }}
+        INPUT_WORKING_DIRECTORY: ${{ inputs.working-directory }}
+      run: node "$CLIDOC_ACTION_PATH/src/main.mjs"
