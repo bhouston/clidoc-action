@@ -92,7 +92,7 @@ GitHub error annotation. Use a workflow matrix for per-document jobs.
 
 ## Runner and security requirements
 
-The action sets up Node `26.1.0`, and source mode also sets up pnpm `11.1.3`.
+The action sets up Node `26.1.0`, and source mode also sets up pnpm `12.16.1`.
 These tools remain available to subsequent job steps. Self-hosted runners need
 support for Node 24 based setup actions, Git, Bash, and access to GitHub and npm.
 No token or write permissions are needed. Installation uses an isolated temporary
